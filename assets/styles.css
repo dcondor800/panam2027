@@ -61,6 +61,11 @@ html, body {
   width: var(--poster-ancho);
   max-width: var(--poster-ancho);
   height: calc(var(--poster-ancho) * var(--poster-h) / var(--poster-w));
+
+  /* Sin esto el flex de .escena le recorta el alto para que quepa
+     en pantalla y la imagen se ve achatada / estirada a lo ancho. */
+  flex: 0 0 auto;
+  aspect-ratio: var(--poster-w) / var(--poster-h);
 }
 
 .poster__img {
@@ -69,6 +74,7 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: contain;           /* nunca deforma la imagen */
   pointer-events: none;
   user-select: none;
 }
