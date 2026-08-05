@@ -5,6 +5,9 @@
   /* Separacion desde el borde superior de la pantalla */
   --margen-superior: 20px;
 
+  /* Aire al final de la pagina cuando hay scroll */
+  --margen-inferior: 20px;
+
   /* Ancho del poster: 100vw = pantalla completa, sin margenes laterales */
   --poster-ancho: 100vw;
 
@@ -32,8 +35,10 @@ html, body {
   max-width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;              /* sin scroll ni rebote */
-  overscroll-behavior: none;
+  overflow-x: hidden;            /* nunca scroll horizontal */
+  overflow-y: auto;              /* scroll vertical si el poster no cabe */
+  overscroll-behavior-x: none;   /* sin rebote lateral */
+  -webkit-overflow-scrolling: touch;
   background: var(--fondo);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -42,13 +47,16 @@ html, body {
    Escena: ocupa toda la pantalla del dispositivo
    ============================================================ */
 .escena {
-  position: fixed;
-  inset: 0;
+  /* En flujo normal (no fixed) para que la pagina pueda crecer
+     y hacer scroll cuando el poster es mas alto que la pantalla. */
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;            /* llena la pantalla si el poster es corto */
+  padding-bottom: var(--margen-inferior);
   display: flex;
   flex-direction: column;
   align-items: center;
   background: var(--fondo);
-  touch-action: none;
 }
 
 /* ============================================================
