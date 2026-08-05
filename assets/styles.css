@@ -1,0 +1,99 @@
+/* ============================================================
+   Variables de ajuste rapido
+   ============================================================ */
+:root {
+  /* Separacion desde el borde superior de la pantalla */
+  --margen-superior: 20px;
+
+  /* Ancho del poster: 100vw = pantalla completa, sin margenes laterales */
+  --poster-ancho: 100vw;
+
+  /* Dimensiones reales de assets/poster.png (para conservar la proporcion) */
+  --poster-w: 1126;
+  --poster-h: 2338;
+
+  --fondo: #ffffff;
+
+  /* Recuadro interactivo, en % sobre la imagen del poster */
+  --zona-x: 2.9%;
+  --zona-y: 35.2%;
+  --zona-ancho: 94.2%;
+  --zona-alto: 54.3%;
+  --zona-radio: 6.5% / 2.8%;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;              /* sin scroll ni rebote */
+  overscroll-behavior: none;
+  background: var(--fondo);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   Escena: ocupa toda la pantalla del dispositivo
+   ============================================================ */
+.escena {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--fondo);
+  touch-action: none;
+}
+
+/* ============================================================
+   Poster: ancho completo, alto derivado de la proporcion real
+   ============================================================ */
+.poster {
+  position: relative;
+  margin: var(--margen-superior) auto auto;   /* 20px arriba, 0 a los lados */
+  padding: 0;
+  width: var(--poster-ancho);
+  max-width: var(--poster-ancho);
+  height: calc(var(--poster-ancho) * var(--poster-h) / var(--poster-w));
+}
+
+.poster__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================
+   Zona interactiva (pan + pinch zoom)
+   ============================================================ */
+.poster__zona {
+  position: absolute;
+  left: var(--zona-x);
+  top: var(--zona-y);
+  width: var(--zona-ancho);
+  height: var(--zona-alto);
+  border-radius: var(--zona-radio);
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+
+.poster__zona:active { cursor: grabbing; }
+
+.poster__contenido {
+  position: absolute;
+  inset: 0;
+  background: transparent;       /* pon aqui una imagen o color si quieres */
+  transform-origin: 0 0;
+  will-change: transform;
+}
