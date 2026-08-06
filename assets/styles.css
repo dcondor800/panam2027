@@ -242,20 +242,25 @@ body {
   padding: 0 22px;
 }
 
-/* ----- Cabecera de la seccion ----- */
-.programa__titulo {
-  font-size: clamp(24px, 6.4vw, 32px);
-  font-weight: 800;
-  letter-spacing: -0.015em;
-  color: var(--azul-noche);
+/* ----- Entrada de la seccion ----- */
+.programa__intro {
+  max-width: 46ch;   /* ancho justo para que la frase entre en 3 lineas */
+  margin: 0 auto;
+  text-align: center;
+  font-size: 14.5px;
+  font-weight: 600;   /* Semibold: la fuente del sistema si lo tiene,
+                         asi el cierre en negrita se separa de verdad */
+  line-height: 1.5;
+  color: var(--azul);
 }
 
-.programa__intro {
-  margin-top: 10px;
-  max-width: 48ch;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--gris);
+/* El cierre de la frase, mas marcado que el resto.
+   El 900 solo se nota donde la fuente del sistema tiene un peso
+   por encima del Bold (iOS, Android); el trazo extra asegura la
+   diferencia tambien en Windows, que se queda en Bold. */
+.programa__intro strong {
+  font-weight: 900;
+  -webkit-text-stroke: 0.4px currentColor;
 }
 
 /* ----- Bloque (Tarde / Noche) ----- */
@@ -331,7 +336,7 @@ body {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
   column-gap: 14px;
-  padding-bottom: 30px;
+  padding-bottom: 42px;   /* separacion entre horarios */
 
   /* Aparicion al entrar en pantalla (lo activa programa.js) */
   opacity: 0;
@@ -393,7 +398,15 @@ body {
   color: var(--azul-noche);
 }
 
-/* Momento principal de la noche */
+/* Item que continua el horario anterior: sin hora, el bullet se
+   alinea con la unica linea de texto */
+.agenda__item--sin-hora .agenda__punto { grid-row: 1; }
+
+/* El horario que sigue en el item de abajo deja menos hueco, para
+   que se lea como un solo bloque */
+.agenda__item--continua { padding-bottom: 14px; }
+
+/* Momentos principales */
 .agenda__item--destacado { --acento: var(--naranja); }
 .agenda__item--destacado .agenda__punto { width: 16px; height: 16px; margin-top: 2px; }
 .agenda__item--destacado .agenda__evento { font-weight: 700; }
@@ -401,15 +414,19 @@ body {
 /* ----- Franja vertical de activaciones ----- */
 .activaciones {
   display: flex;
-  align-items: center;
+  align-items: center;      /* centrado en el ancho de la pastilla */
+  justify-content: center;  /* y centrado en su alto */
   gap: 12px;
   width: 46px;
-  margin: 92px 0 40px;
+  margin: 80px 0 24px;
   padding: 26px 0;
   border-radius: 999px;
   background: var(--turquesa);
-  writing-mode: vertical-rl;
   color: #ffffff;
+
+  /* Se lee de arriba hacia abajo: el titulo arriba y el horario
+     debajo, en el mismo orden que el HTML */
+  writing-mode: vertical-rl;
 }
 
 .activaciones__titulo {
