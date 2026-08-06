@@ -43,6 +43,11 @@ body {
   margin: 0 auto;
   overflow-x: hidden;            /* nunca scroll horizontal */
   overscroll-behavior-x: none;   /* sin rebote lateral */
+
+  /* Solo scroll vertical: sin pellizco ni doble toque para
+     ampliar la pagina. El mapa se salta esto con su propia
+     regla touch-action: none. */
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   background: var(--fondo);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

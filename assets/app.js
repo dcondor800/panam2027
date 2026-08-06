@@ -130,13 +130,48 @@
     if (e.touches.length > 1) e.preventDefault();
   }, { passive: false });
 
-  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (tipo) {
-    zona.addEventListener(tipo, function (e) { e.preventDefault(); });
-  });
-
   // Si la zona cambia de tamano (giro de pantalla), recolocar
   window.addEventListener('resize', function () { medir(); pintar(); });
+  window.addEventListener('load', function () { medir(); pintar(); });
 
   medir();
   pintar();
+})();
+
+
+/* ============================================================
+   Viewport fijo: la pagina no se amplia con los dedos.
+   El meta viewport y touch-action ya lo impiden en Chrome y
+   Firefox; Safari en iOS ignora user-scalable, asi que ahi hace
+   falta cancelar los gestos a mano.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var zona = document.getElementById('zona');
+
+  function fueraDelMapa(e) {
+    return !zona || !zona.contains(e.target);
+  }
+
+  // Gestos propios de Safari (los del mapa tambien: alli el zoom
+  // lo calcula app.js con pointer events, no con estos eventos)
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (tipo) {
+    document.addEventListener(tipo, function (e) {
+      e.preventDefault();
+    }, { passive: false });
+  });
+
+  // Pellizco con dos dedos en cualquier punto que no sea el mapa
+  document.addEventListener('touchmove', function (e) {
+    if (e.touches.length > 1 && fueraDelMapa(e)) e.preventDefault();
+  }, { passive: false });
+
+  // Doble toque rapido para ampliar
+  var ultimoToque = 0;
+  document.addEventListener('touchend', function (e) {
+    var ahora = Date.now();
+    if (ahora - ultimoToque < 320 && fueraDelMapa(e)) e.preventDefault();
+    ultimoToque = ahora;
+  }, { passive: false });
 })();
