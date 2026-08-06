@@ -5,37 +5,200 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lima 2027 - Juegos PanAm y Parapan</title>
 <link rel="stylesheet" href="assets/styles.css">
+<!-- Sin JavaScript los items del programa se ven igual, solo sin animacion -->
+<noscript><style>.agenda__item { opacity: 1; transform: none; }</style></noscript>
 </head>
 <body>
 
   <!-- ============================================================
-       Contenedor del poster.
-       Ajusta el margen superior / ancho desde assets/styles.css
-       (variables --margen-superior, --poster-ancho, --poster-w/h).
+       1. Cabecera
        ============================================================ -->
-  <div class="escena">
-    <div class="poster">
+  <header class="cabecera">
+    <img class="cabecera__img"
+         src="assets/lima2027header.png"
+         alt="Lima 2027 - Juegos PanAm y Parapan"
+         draggable="false">
+  </header>
 
-      <!-- Imagen de fondo (no interactiva) -->
-      <img class="poster__img"
-           src="assets/poster.png"
-           alt="Lima 2027 - Juegos PanAm y Parapan"
-           draggable="false">
+  <!-- ============================================================
+       2. Mapa: arrastrar con un dedo, pellizcar con dos para
+          acercar. La logica esta en assets/app.js
+       ============================================================ -->
+  <section class="mapa">
+    <h2 class="mapa__titulo">¡Vive la celebración!</h2>
 
-      <!-- Zona interactiva: arrastrar (1 dedo) y pellizcar para zoom (2 dedos).
-           Su posicion va en % sobre la imagen, definida en styles.css -->
-      <div class="poster__zona" id="zona">
-        <div class="poster__contenido" id="contenido">
+    <div class="mapa__marco">
+      <div class="mapa__zona" id="zona">
+        <div class="mapa__contenido" id="contenido">
           <img class="croquis"
                src="assets/croquis.png"
-               alt="Croquis de sedes - Lima 2027"
+               alt="Croquis de sedes y experiencias de la celebración"
                draggable="false">
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       3. Programa del evento.
+          El degradado del fondo se mueve lentamente (CSS) y los
+          bullets crecen con el scroll (assets/programa.js).
+       ============================================================ -->
+  <section class="programa">
+
+    <!-- Capas del degradado en movimiento -->
+    <div class="programa__aura" aria-hidden="true"></div>
+
+    <div class="programa__interior">
+
+      <header class="programa__cabecera">
+        <h2 class="programa__titulo">A un año de los Juegos</h2>
+        <p class="programa__intro">
+          Una jornada de deporte, cultura, música, gastronomía y entretenimiento
+          para celebrar que falta solo un año para los Juegos.
+        </p>
+      </header>
+
+      <!-- ---------- Tarde ---------- -->
+      <article class="bloque bloque--tarde">
+        <header class="bloque__cabecera">
+          <p class="bloque__momento">Tarde</p>
+          <div class="bloque__fila">
+            <h3 class="bloque__titulo">Programa familiar</h3>
+            <p class="bloque__rango">2:45 – 6:30 p.m.</p>
+          </div>
+        </header>
+
+        <div class="bloque__cuerpo">
+          <ol class="agenda">
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">2:45 p.m.</p>
+              <p class="agenda__evento">Inicio de la celebración</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">3:00 p.m.</p>
+              <p class="agenda__evento">Show familiar con Brenda Carvalho</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">4:00 p.m.</p>
+              <p class="agenda__evento">Primera presentación de la Banda Musical de las FF. AA.</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">4:30 p.m.</p>
+              <p class="agenda__evento">Show artístico de Ensamble Perú Fusión</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">5:30 p.m.</p>
+              <p class="agenda__evento">Segunda presentación de la Banda Musical de las FF. AA.</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">5:45 p.m.</p>
+              <p class="agenda__evento">Show artístico de Kimbafá</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">6:30 p.m.</p>
+              <p class="agenda__evento">Antesala de la celebración</p>
+            </li>
+          </ol>
+
+          <!-- Franja vertical de la derecha -->
+          <aside class="activaciones">
+            <span class="activaciones__titulo">Activaciones y experiencias</span>
+            <span class="activaciones__punto" aria-hidden="true"></span>
+            <span class="activaciones__horario">Desde las 3:00 p.m.</span>
+          </aside>
+        </div>
+      </article>
+
+      <!-- ---------- Noche ---------- -->
+      <article class="bloque bloque--noche">
+        <header class="bloque__cabecera">
+          <p class="bloque__momento">Noche</p>
+          <div class="bloque__fila">
+            <h3 class="bloque__titulo">Celebración central</h3>
+            <p class="bloque__rango">7:00 – 9:00 p.m.</p>
+          </div>
+        </header>
+
+        <div class="bloque__cuerpo">
+          <ol class="agenda">
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:00 p.m.</p>
+              <p class="agenda__evento">Inicio de la celebración central</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:05 p.m.</p>
+              <p class="agenda__evento">Obertura artística con Ernesto Hermosa y el Ballet Folclórico Nacional</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:12 p.m.</p>
+              <p class="agenda__evento">Presentación de Claudia Madueño</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:21 p.m.</p>
+              <p class="agenda__evento">Presentación de Nahomi Chávez</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:30 p.m.</p>
+              <p class="agenda__evento">Espectáculo de videomapping sobre la Catedral de Lima</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">7:40 p.m.</p>
+              <p class="agenda__evento">Momento Protocolar</p>
+            </li>
+            <li class="agenda__item agenda__item--destacado">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">8:00 p.m.</p>
+              <p class="agenda__evento">Encendido oficial de la cuenta regresiva y espectáculo de fuegos artificiales</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">8:05 p.m.</p>
+              <p class="agenda__evento">Gran concierto de cierre con Los Mirlos</p>
+            </li>
+            <li class="agenda__item">
+              <span class="agenda__punto" aria-hidden="true"></span>
+              <p class="agenda__hora">9:00 p.m.</p>
+              <p class="agenda__evento">Fin del evento</p>
+            </li>
+          </ol>
+        </div>
+      </article>
 
     </div>
-  </div>
+  </section>
+
+  <!-- ============================================================
+       4. Cierre: cerros, lema y logos
+       ============================================================ -->
+  <footer class="pie">
+    <img class="pie__cerros"
+         src="assets/cerros-footer.png"
+         alt=""
+         draggable="false">
+
+    <p class="pie__lema">Juntos brillamos más</p>
+
+    <img class="pie__logos"
+         src="assets/logos-footer.png"
+         alt="Lima 2027, PanAm Sports y Americas Paralympic Committee"
+         draggable="false">
+  </footer>
 
   <script src="assets/app.js"></script>
+  <script src="assets/programa.js"></script>
 </body>
 </html>
