@@ -14,11 +14,13 @@
   --azul-noche: #1f3f74;    /* texto principal */
   --azul-mapa: #1d4278;     /* fondo de la seccion del mapa */
   --cyan: #1791c8;
+  --turquesa: #48bac1;      /* franja de activaciones */
+  --azul-pastilla: #364f90; /* pastilla del horario de noche */
   --morado: #7b2e7b;
   --magenta: #b23781;
   --verde: #a9c73a;
   --naranja: #e05111;
-  --gris: #6b7a90;          /* textos secundarios */
+  --gris: #465a75;          /* textos secundarios (legible sobre el celeste) */
 
   /* Proporcion real de assets/croquis.png */
   --croquis-w: 5524;
@@ -129,8 +131,20 @@ body {
   isolation: isolate;
   overflow: hidden;
   padding: 50px 0 46px;
+
+  /* Arranca en celeste y se abre hacia el blanco del pie.
+     La capa es mas alta que la seccion y sube y baja despacio,
+     asi el degradado nunca se ve quieto. */
   background: linear-gradient(180deg,
-              #ffffff 0%, #f5f9fd 30%, #eaf1fa 70%, #ffffff 100%);
+              #a9dcf2 0%, #cbe9f8 14%, #e6f2fb 42%, #f7fbfe 74%, #ffffff 100%);
+  background-size: 100% 150%;
+  background-position: 0% 0%;
+  animation: fondo-celeste 30s ease-in-out infinite alternate;
+}
+
+@keyframes fondo-celeste {
+  from { background-position: 0% 0%; }
+  to   { background-position: 0% 100%; }
 }
 
 /* ----- Degradado en movimiento -----------------------------
@@ -143,12 +157,11 @@ body {
   pointer-events: none;
   overflow: hidden;
 
-  /* Se apaga arriba y abajo para que no se vea el corte con
-     la seccion del mapa ni con el pie */
+  /* Se apaga hacia abajo para que no se vea el corte con el pie */
   -webkit-mask-image: linear-gradient(180deg,
-              transparent 0%, #000 14%, #000 84%, transparent 100%);
+              #000 0%, #000 76%, transparent 100%);
   mask-image: linear-gradient(180deg,
-              transparent 0%, #000 14%, #000 84%, transparent 100%);
+              #000 0%, #000 76%, transparent 100%);
 }
 
 .programa__aura::before,
@@ -161,13 +174,13 @@ body {
   will-change: transform;
 }
 
-/* Mancha cyan: recorre la parte alta */
+/* Mancha celeste: la mas marcada, recorre la parte alta */
 .programa__aura::before {
   left: -46%;
-  top: -14%;
+  top: -20%;
   background: radial-gradient(circle at 50% 50%,
-              rgba(23, 145, 200, 0.20), rgba(23, 145, 200, 0) 68%);
-  animation: aura-cyan 26s ease-in-out infinite alternate;
+              rgba(86, 190, 235, 0.55), rgba(86, 190, 235, 0) 68%);
+  animation: aura-celeste 26s ease-in-out infinite alternate;
 }
 
 /* Mancha magenta: recorre la parte baja */
@@ -175,18 +188,46 @@ body {
   right: -52%;
   bottom: -10%;
   background: radial-gradient(circle at 50% 50%,
-              rgba(178, 55, 129, 0.17), rgba(178, 55, 129, 0) 68%);
+              rgba(178, 55, 129, 0.16), rgba(178, 55, 129, 0) 68%);
   animation: aura-magenta 34s ease-in-out infinite alternate;
 }
 
-@keyframes aura-cyan {
+/* Segunda capa: otros dos tonos con tiempos distintos, para que
+   la mezcla no repita nunca la misma composicion */
+.programa__aura--2::before {
+  right: -40%;
+  top: 4%;
+  background: radial-gradient(circle at 50% 50%,
+              rgba(23, 145, 200, 0.30), rgba(23, 145, 200, 0) 66%);
+  animation: aura-cyan 19s ease-in-out infinite alternate;
+}
+
+.programa__aura--2::after {
+  left: -44%;
+  bottom: 12%;
+  background: radial-gradient(circle at 50% 50%,
+              rgba(84, 200, 205, 0.24), rgba(84, 200, 205, 0) 66%);
+  animation: aura-turquesa 41s ease-in-out infinite alternate;
+}
+
+@keyframes aura-celeste {
   from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(26%, 10%, 0) scale(1.18); }
+  to   { transform: translate3d(30%, 14%, 0) scale(1.22); }
 }
 
 @keyframes aura-magenta {
   from { transform: translate3d(0, 0, 0) scale(1.12); }
   to   { transform: translate3d(-22%, -14%, 0) scale(0.94); }
+}
+
+@keyframes aura-cyan {
+  from { transform: translate3d(0, 0, 0) scale(1.08); }
+  to   { transform: translate3d(-26%, 20%, 0) scale(0.9); }
+}
+
+@keyframes aura-turquesa {
+  from { transform: translate3d(0, 0, 0) scale(0.92); }
+  to   { transform: translate3d(24%, -18%, 0) scale(1.16); }
 }
 
 .programa__interior {
@@ -257,6 +298,13 @@ body {
   font-weight: 600;
   white-space: nowrap;
   color: var(--azul-noche);
+}
+
+/* En el bloque de noche la pastilla va en azul solido */
+.bloque--noche .bloque__rango {
+  border-color: transparent;
+  background: var(--azul-pastilla);
+  color: #ffffff;
 }
 
 .bloque__cuerpo {
@@ -354,7 +402,7 @@ body {
   margin: 92px 0 40px;
   padding: 26px 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, #5cc7dd 0%, #2fa8c8 100%);
+  background: var(--turquesa);
   writing-mode: vertical-rl;
   color: #ffffff;
 }
@@ -407,6 +455,7 @@ body {
    Menos movimiento si el sistema lo pide
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
+  .programa,
   .programa__aura::before,
   .programa__aura::after { animation: none; }
 
