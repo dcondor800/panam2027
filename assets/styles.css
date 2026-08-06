@@ -2,30 +2,27 @@
    Variables de ajuste rapido
    ============================================================ */
 :root {
-  /* Separacion desde el borde superior de la pantalla */
-  --margen-superior: 20px;
-
-  /* Aire al final de la pagina cuando hay scroll */
-  --margen-inferior: 20px;
-
-  /* Ancho del poster: 100vw = pantalla completa, sin margenes laterales */
-  --poster-ancho: 100vw;
-
-  /* Dimensiones reales de assets/poster.png (para conservar la proporcion) */
-  --poster-w: 1126;
-  --poster-h: 2338;
+  /* Ancho maximo de la pagina: en el movil no se nota, en el
+     escritorio deja la landing centrada como una tarjeta */
+  --pagina-ancho: 620px;
 
   --fondo: #ffffff;
+  --fondo-fuera: #eef1f6;   /* a los lados, solo en pantallas anchas */
 
-  /* Recuadro interactivo, en % sobre la imagen del poster.
-     Medido sobre poster.png (1126x2338): el trazo azul ocupa
-     x 28..1096 e y 927..1854, con ~10px de grosor y esquinas de 46px.
-     Estos % corresponden al INTERIOR del trazo: x 38..1086, y 937..1843. */
-  --zona-x: 3.37%;      /*   38 / 1126 */
-  --zona-y: 40.08%;     /*  937 / 2338 */
-  --zona-ancho: 93.07%; /* 1048 / 1126 */
-  --zona-alto: 38.75%;  /*  906 / 2338 */
-  --zona-radio: 4% / 4.6%;  /* ~42px, radio interior de las esquinas */
+  /* ----- Paleta de marca, tomada de los assets ----- */
+  --azul: #3275b9;          /* azul del logo y de los titulos */
+  --azul-noche: #1f3f74;    /* texto principal */
+  --azul-mapa: #1d4278;     /* fondo de la seccion del mapa */
+  --cyan: #1791c8;
+  --morado: #7b2e7b;
+  --magenta: #b23781;
+  --verde: #a9c73a;
+  --naranja: #e05111;
+  --gris: #6b7a90;          /* textos secundarios */
+
+  /* Proporcion real de assets/croquis.png */
+  --croquis-w: 5524;
+  --croquis-h: 4872;
 }
 
 /* ============================================================
@@ -33,90 +30,85 @@
    ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
+html {
+  background: var(--fondo-fuera);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
   width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
+  max-width: var(--pagina-ancho);
+  margin: 0 auto;
   overflow-x: hidden;            /* nunca scroll horizontal */
-  overflow-y: auto;              /* scroll vertical si el poster no cabe */
   overscroll-behavior-x: none;   /* sin rebote lateral */
   -webkit-overflow-scrolling: touch;
   background: var(--fondo);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ============================================================
-   Escena: ocupa toda la pantalla del dispositivo
-   ============================================================ */
-.escena {
-  /* En flujo normal (no fixed) para que la pagina pueda crecer
-     y hacer scroll cuando el poster es mas alto que la pantalla. */
-  position: relative;
-  width: 100%;
-  min-height: 100dvh;            /* llena la pantalla si el poster es corto */
-  padding-bottom: var(--margen-inferior);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--fondo);
-}
-
-/* ============================================================
-   Poster: ancho completo, alto derivado de la proporcion real
-   ============================================================ */
-.poster {
-  position: relative;
-  margin: var(--margen-superior) auto auto;   /* 20px arriba, 0 a los lados */
-  padding: 0;
-  width: var(--poster-ancho);
-  max-width: var(--poster-ancho);
-  height: calc(var(--poster-ancho) * var(--poster-h) / var(--poster-w));
-
-  /* Sin esto el flex de .escena le recorta el alto para que quepa
-     en pantalla y la imagen se ve achatada / estirada a lo ancho. */
-  flex: 0 0 auto;
-  aspect-ratio: var(--poster-w) / var(--poster-h);
-}
-
-.poster__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+/* Las imagenes de seccion siempre a ancho completo */
+.cabecera__img,
+.pie__cerros {
   display: block;
-  object-fit: contain;           /* nunca deforma la imagen */
-  pointer-events: none;
+  width: 100%;
+  height: auto;
   user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* ============================================================
-   Zona interactiva (pan + pinch zoom)
+   1. Cabecera
    ============================================================ */
-.poster__zona {
-  position: absolute;
-  left: var(--zona-x);
-  top: var(--zona-y);
-  width: var(--zona-ancho);
-  height: var(--zona-alto);
-  border-radius: var(--zona-radio);
-  overflow: hidden;
-  touch-action: none;
+.cabecera {
+  background: var(--fondo);
+  line-height: 0;                /* sin hueco bajo la imagen */
+}
+
+/* ============================================================
+   2. Mapa
+   ============================================================ */
+.mapa {
+  padding: 26px 18px 34px;
+  background: linear-gradient(180deg, #24518f 0%, var(--azul-mapa) 100%);
+}
+
+.mapa__titulo {
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: clamp(20px, 5.4vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* Marco blanco redondeado */
+.mapa__marco {
+  padding: 9px;
+  border-radius: 28px;
+  background: var(--fondo);
+  box-shadow: 0 10px 26px rgba(10, 30, 60, 0.18);
+}
+
+/* Zona interactiva: misma proporcion que el croquis, asi lo
+   llena justo, sin franjas ni recortes */
+.mapa__zona {
+  position: relative;
+  aspect-ratio: var(--croquis-w) / var(--croquis-h);
+  border-radius: 20px;
+  overflow: hidden;              /* el zoom nunca se sale del marco */
+  touch-action: none;            /* los gestos los maneja app.js */
   cursor: grab;
 }
 
-.poster__zona:active { cursor: grabbing; }
+.mapa__zona:active { cursor: grabbing; }
 
-.poster__contenido {
+.mapa__contenido {
   position: absolute;
   inset: 0;
-  background: transparent;       /* pon aqui una imagen o color si quieres */
   transform-origin: 0 0;
   will-change: transform;
 }
 
-/* Croquis dentro de la zona: se ve completo al inicio (contain) y el
-   pellizco con dos dedos lo amplia hasta 4x (ZOOM_MAX en app.js). */
 .croquis {
   position: absolute;
   inset: 0;
@@ -124,7 +116,305 @@ html, body {
   height: 100%;
   display: block;
   object-fit: contain;           /* nunca deforma el croquis */
-  pointer-events: none;          /* los gestos los maneja .poster__zona */
+  pointer-events: none;          /* los gestos los maneja .mapa__zona */
   user-select: none;
   -webkit-user-drag: none;
+}
+
+/* ============================================================
+   3. Programa del evento
+   ============================================================ */
+.programa {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 50px 0 46px;
+  background: linear-gradient(180deg,
+              #ffffff 0%, #f5f9fd 30%, #eaf1fa 70%, #ffffff 100%);
+}
+
+/* ----- Degradado en movimiento -----------------------------
+   Dos manchas de color de marca, muy tenues, que se desplazan
+   despacio. Solo se anima transform (no repinta el layout).   */
+.programa__aura {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* Se apaga arriba y abajo para que no se vea el corte con
+     la seccion del mapa ni con el pie */
+  -webkit-mask-image: linear-gradient(180deg,
+              transparent 0%, #000 14%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(180deg,
+              transparent 0%, #000 14%, #000 84%, transparent 100%);
+}
+
+.programa__aura::before,
+.programa__aura::after {
+  content: "";
+  position: absolute;
+  width: 118%;
+  padding-bottom: 118%;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+/* Mancha cyan: recorre la parte alta */
+.programa__aura::before {
+  left: -46%;
+  top: -14%;
+  background: radial-gradient(circle at 50% 50%,
+              rgba(23, 145, 200, 0.20), rgba(23, 145, 200, 0) 68%);
+  animation: aura-cyan 26s ease-in-out infinite alternate;
+}
+
+/* Mancha magenta: recorre la parte baja */
+.programa__aura::after {
+  right: -52%;
+  bottom: -10%;
+  background: radial-gradient(circle at 50% 50%,
+              rgba(178, 55, 129, 0.17), rgba(178, 55, 129, 0) 68%);
+  animation: aura-magenta 34s ease-in-out infinite alternate;
+}
+
+@keyframes aura-cyan {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(26%, 10%, 0) scale(1.18); }
+}
+
+@keyframes aura-magenta {
+  from { transform: translate3d(0, 0, 0) scale(1.12); }
+  to   { transform: translate3d(-22%, -14%, 0) scale(0.94); }
+}
+
+.programa__interior {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+/* ----- Cabecera de la seccion ----- */
+.programa__titulo {
+  font-size: clamp(24px, 6.4vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--azul-noche);
+}
+
+.programa__intro {
+  margin-top: 10px;
+  max-width: 48ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--gris);
+}
+
+/* ----- Bloque (Tarde / Noche) ----- */
+.bloque { margin-top: 46px; }
+
+.bloque--tarde { --acento: var(--cyan);   --linea: #f0a2c6; }
+.bloque--noche { --acento: var(--morado); --linea: #e08cba; }
+
+.bloque__momento {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--acento);
+}
+
+.bloque__fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.bloque__titulo {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: clamp(19px, 5.2vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--azul-noche);
+}
+
+/* No se encoge nunca; si no cabe junto al titulo, baja de linea
+   y se queda pegado a la derecha gracias al margen automatico. */
+.bloque__rango {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 6px 13px;
+  border: 1px solid #dbe5f1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--azul-noche);
+}
+
+.bloque__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 18px;
+  margin-top: 26px;
+}
+
+/* ----- Linea de tiempo ----- */
+.agenda {
+  position: relative;
+  list-style: none;
+}
+
+.agenda__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 14px;
+  padding-bottom: 30px;
+
+  /* Aparicion al entrar en pantalla (lo activa programa.js) */
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.agenda__item:last-child { padding-bottom: 0; }
+
+.agenda__item.esta-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Cada item dibuja el tramo de linea que lo une con el siguiente,
+   asi queda centrado bajo su bullet y no sobra nada al final. */
+.agenda__item::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 15px;
+  bottom: -8px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--linea);
+}
+
+.agenda__item:last-child::before { content: none; }
+
+/* El bullet. --crecer lo actualiza programa.js con el scroll. */
+.agenda__punto {
+  position: relative;   /* por encima del tramo de linea */
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
+  justify-self: center;
+  width: 13px;
+  height: 13px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--acento);
+  transform: scale(var(--crecer, 1));
+  transform-origin: 50% 50%;
+}
+
+.agenda__hora {
+  grid-column: 2;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--acento);
+}
+
+.agenda__evento {
+  grid-column: 2;
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--azul-noche);
+}
+
+/* Momento principal de la noche */
+.agenda__item--destacado { --acento: var(--naranja); }
+.agenda__item--destacado .agenda__punto { width: 16px; height: 16px; margin-top: 2px; }
+.agenda__item--destacado .agenda__evento { font-weight: 700; }
+
+/* ----- Franja vertical de activaciones ----- */
+.activaciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 46px;
+  margin: 92px 0 40px;
+  padding: 26px 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5cc7dd 0%, #2fa8c8 100%);
+  writing-mode: vertical-rl;
+  color: #ffffff;
+}
+
+.activaciones__titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.activaciones__punto {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.activaciones__horario {
+  font-size: 11px;
+  opacity: 0.95;
+}
+
+/* ============================================================
+   4. Pie: cerros, lema y logos
+   ============================================================ */
+.pie {
+  padding-bottom: 38px;
+  background: var(--fondo);
+}
+
+.pie__lema {
+  margin: 20px 0 26px;
+  text-align: center;
+  font-size: clamp(19px, 5vw, 24px);
+  font-weight: 800;
+  color: var(--azul);
+}
+
+.pie__logos {
+  display: block;
+  width: min(76%, 330px);
+  height: auto;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ============================================================
+   Menos movimiento si el sistema lo pide
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .programa__aura::before,
+  .programa__aura::after { animation: none; }
+
+  .agenda__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .agenda__punto { transform: none; }
 }
