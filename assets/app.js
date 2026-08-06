@@ -1,6 +1,11 @@
 /* ============================================================
    Pan (arrastrar) + pinch zoom sobre la zona interactiva.
    Version en JavaScript plano, sin frameworks.
+
+   El gesto es INCREMENTAL: cada movimiento parte del estado que
+   ya esta en pantalla, no del estado inicial del gesto. Asi el
+   croquis no se desplaza cuando el limite recorta la posicion o
+   cuando el navegador se salta algun evento.
    ============================================================ */
 (function () {
   'use strict';
@@ -12,116 +17,126 @@
   var contenido = document.getElementById('contenido');
   if (!zona || !contenido) return;
 
+  // scale = ampliacion actual; tx/ty = desplazamiento en px de pantalla
   var estado = { scale: 1, tx: 0, ty: 0 };
-  var punteros = new Map();
-  var gesto = null;
 
-  function distancia(a, b) {
-    return Math.hypot(a.x - b.x, a.y - b.y);
-  }
+  var punteros = new Map();   // pointerId -> {x, y}
+  var previo = null;          // referencia del movimiento anterior
+  var rect = null;            // medidas de la zona durante el gesto
 
-  function medio(a, b) {
-    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-  }
+  function distancia(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+  function medio(a, b) { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
 
-  // Limita el zoom y evita que el contenido se despegue de los bordes
-  function limitar(scale, tx, ty, rect) {
-    var s = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, scale));
-    var maxX = rect.width * (s - 1);
-    var maxY = rect.height * (s - 1);
+  function dedos() { return Array.from(punteros.values()); }
+
+  function medir() { rect = zona.getBoundingClientRect(); }
+
+  // Mantiene el croquis cubriendo la zona: sin zoom queda centrado,
+  // con zoom no puede despegarse de ningun borde.
+  function limitar(s, tx, ty) {
+    var sobraX = rect.width * s - rect.width;
+    var sobraY = rect.height * s - rect.height;
     return {
       scale: s,
-      tx: Math.min(0, Math.max(-maxX, tx)),
-      ty: Math.min(0, Math.max(-maxY, ty))
+      tx: sobraX <= 0 ? -sobraX / 2 : Math.min(0, Math.max(-sobraX, tx)),
+      ty: sobraY <= 0 ? -sobraY / 2 : Math.min(0, Math.max(-sobraY, ty))
     };
   }
 
-  function pintar() {
+  function aplicar(s, tx, ty) {
+    estado = limitar(s, tx, ty);
     contenido.style.transform =
       'translate(' + estado.tx + 'px, ' + estado.ty + 'px) scale(' + estado.scale + ')';
   }
 
-  function aplicar(nuevo) {
-    estado = nuevo;
-    pintar();
+  function pintar() { aplicar(estado.scale, estado.tx, estado.ty); }
+
+  // Recalcula la referencia a partir de los dedos que hay ahora.
+  // Se llama al apoyar o levantar un dedo para que no haya saltos.
+  function referenciar() {
+    var pts = dedos();
+    if (pts.length === 1) {
+      previo = { modo: 'pan', punto: { x: pts[0].x, y: pts[0].y } };
+    } else if (pts.length >= 2) {
+      previo = {
+        modo: 'pinch',
+        dist: distancia(pts[0], pts[1]),
+        centro: medio(pts[0], pts[1])
+      };
+    } else {
+      previo = null;
+    }
   }
 
   zona.addEventListener('pointerdown', function (e) {
     zona.setPointerCapture(e.pointerId);
     punteros.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    var rect = zona.getBoundingClientRect();
-    var pts = Array.from(punteros.values());
-
-    if (punteros.size === 1) {
-      gesto = {
-        modo: 'pan',
-        scale: estado.scale, tx: estado.tx, ty: estado.ty,
-        inicio: { x: pts[0].x, y: pts[0].y },
-        rect: rect
-      };
-    } else if (punteros.size === 2) {
-      gesto = {
-        modo: 'pinch',
-        scale: estado.scale, tx: estado.tx, ty: estado.ty,
-        dist: distancia(pts[0], pts[1]),
-        medio: medio(pts[0], pts[1]),
-        rect: rect
-      };
-    }
+    medir();
+    referenciar();
   });
 
   zona.addEventListener('pointermove', function (e) {
-    if (!punteros.has(e.pointerId)) return;
+    if (!punteros.has(e.pointerId) || !previo) return;
     punteros.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (!gesto) return;
 
-    var rect = gesto.rect;
+    var pts = dedos();
 
-    if (gesto.modo === 'pan' && punteros.size === 1) {
-      var p = punteros.get(e.pointerId);
-      var dx = p.x - gesto.inicio.x;
-      var dy = p.y - gesto.inicio.y;
-      aplicar(limitar(gesto.scale, gesto.tx + dx, gesto.ty + dy, rect));
+    if (previo.modo === 'pan' && pts.length === 1) {
+      // Un dedo: recorre el croquis
+      var p = pts[0];
+      aplicar(
+        estado.scale,
+        estado.tx + (p.x - previo.punto.x),
+        estado.ty + (p.y - previo.punto.y)
+      );
+      previo.punto = { x: p.x, y: p.y };
 
-    } else if (gesto.modo === 'pinch' && punteros.size === 2) {
-      var pts = Array.from(punteros.values());
+    } else if (previo.modo === 'pinch' && pts.length >= 2) {
+      // Dos dedos: el punto que hay entre los dedos se queda quieto
       var dist = distancia(pts[0], pts[1]);
-      var med = medio(pts[0], pts[1]);
-      var nuevoScale = gesto.scale * (dist / gesto.dist);
-      var localX = gesto.medio.x - rect.left;
-      var localY = gesto.medio.y - rect.top;
-      var delta = nuevoScale / gesto.scale;
-      var tx = (gesto.tx - localX) * delta + localX + (med.x - gesto.medio.x);
-      var ty = (gesto.ty - localY) * delta + localY + (med.y - gesto.medio.y);
-      aplicar(limitar(nuevoScale, tx, ty, rect));
+      var centro = medio(pts[0], pts[1]);
+      if (previo.dist <= 0) { previo.dist = dist; return; }
+
+      var deseado = estado.scale * (dist / previo.dist);
+      var nuevo = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, deseado));
+      var factor = nuevo / estado.scale;   // el real, ya con el tope aplicado
+
+      // Ancla local del gesto, relativa a la esquina de la zona
+      var cx = previo.centro.x - rect.left;
+      var cy = previo.centro.y - rect.top;
+
+      aplicar(
+        nuevo,
+        (estado.tx - cx) * factor + cx + (centro.x - previo.centro.x),
+        (estado.ty - cy) * factor + cy + (centro.y - previo.centro.y)
+      );
+
+      previo.dist = dist;
+      previo.centro = centro;
     }
   });
 
   function soltar(e) {
     punteros.delete(e.pointerId);
-
-    if (punteros.size === 0) {
-      gesto = null;
-    } else if (punteros.size === 1) {
-      // De pinch a pan: se reinicia el gesto con el dedo que queda
-      var pts = Array.from(punteros.values());
-      gesto = {
-        modo: 'pan',
-        scale: estado.scale, tx: estado.tx, ty: estado.ty,
-        inicio: { x: pts[0].x, y: pts[0].y },
-        rect: gesto ? gesto.rect : zona.getBoundingClientRect()
-      };
-    }
+    referenciar();   // de pinch a pan (o fin del gesto) sin salto
   }
 
   zona.addEventListener('pointerup', soltar);
   zona.addEventListener('pointercancel', soltar);
 
-  // Safari en iOS hace zoom de toda la pagina al pellizcar; dentro de la
-  // zona el gesto debe ampliar solo el croquis.
+  // El navegador tambien quiere hacer zoom de la pagina al pellizcar.
+  // Dentro del recuadro el gesto es solo para el croquis.
+  zona.addEventListener('touchmove', function (e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (tipo) {
     zona.addEventListener(tipo, function (e) { e.preventDefault(); });
   });
 
+  // Si la zona cambia de tamano (giro de pantalla), recolocar
+  window.addEventListener('resize', function () { medir(); pintar(); });
+
+  medir();
   pintar();
 })();
