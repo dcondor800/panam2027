@@ -17,12 +17,15 @@
 
   --fondo: #ffffff;
 
-  /* Recuadro interactivo, en % sobre la imagen del poster */
-  --zona-x: 2.9%;
-  --zona-y: 35.2%;
-  --zona-ancho: 94.2%;
-  --zona-alto: 54.3%;
-  --zona-radio: 6.5% / 2.8%;
+  /* Recuadro interactivo, en % sobre la imagen del poster.
+     Medido sobre poster.png (1126x2338): el trazo azul ocupa
+     x 28..1096 e y 927..1854, con ~10px de grosor y esquinas de 46px.
+     Estos % corresponden al INTERIOR del trazo: x 38..1086, y 937..1843. */
+  --zona-x: 3.37%;      /*   38 / 1126 */
+  --zona-y: 40.08%;     /*  937 / 2338 */
+  --zona-ancho: 93.07%; /* 1048 / 1126 */
+  --zona-alto: 38.75%;  /*  906 / 2338 */
+  --zona-radio: 4% / 4.6%;  /* ~42px, radio interior de las esquinas */
 }
 
 /* ============================================================
@@ -110,4 +113,18 @@ html, body {
   background: transparent;       /* pon aqui una imagen o color si quieres */
   transform-origin: 0 0;
   will-change: transform;
+}
+
+/* Croquis dentro de la zona: se ve completo al inicio (contain) y el
+   pellizco con dos dedos lo amplia hasta 4x (ZOOM_MAX en app.js). */
+.croquis {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;           /* nunca deforma el croquis */
+  pointer-events: none;          /* los gestos los maneja .poster__zona */
+  user-select: none;
+  -webkit-user-drag: none;
 }

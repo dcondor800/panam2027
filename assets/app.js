@@ -117,5 +117,11 @@
   zona.addEventListener('pointerup', soltar);
   zona.addEventListener('pointercancel', soltar);
 
+  // Safari en iOS hace zoom de toda la pagina al pellizcar; dentro de la
+  // zona el gesto debe ampliar solo el croquis.
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (tipo) {
+    zona.addEventListener(tipo, function (e) { e.preventDefault(); });
+  });
+
   pintar();
 })();
